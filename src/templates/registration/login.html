@@ -43,6 +43,11 @@
                         <label class="form-label">Senha</label>
                         <input type="password" class="form-control" name="password">
                     </div>
+                    <div>
+                      {% if form.errors %}
+                          <b><p class="text-danger">usuário ou senha incorretos</p></b>
+                      {% endif %}
+                    </div>
 
                     <button class="btn bg-gradient-info" type="submit">Entrar</button>
                     <p class="mt-4 text-sm text-center">
