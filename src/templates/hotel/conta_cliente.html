@@ -1,0 +1,162 @@
+{% load static %}
+
+<div class="card">
+    <div class="table-responsive">
+      <table class="table align-items-center mb-0">
+        <thead>
+          <tr>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Cliente</th>
+            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Quarto</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Entrada</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Saída</th>
+            <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Total</th>
+            <th class="text-secondary opacity-7"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for reserva in reservas %}
+            {% if not reserva.encerrado %}
+                <tr>
+                  <td>
+                    <div class="d-flex px-2 py-1">
+                      <div>
+                        <img src="/static{{ reserva.cliente.upload.url }}" class="avatar avatar-sm me-3">
+                      </div>
+                      <div class="d-flex flex-column justify-content-center">
+                        <h6 class="mb-0 text-xs">{{ reserva.cliente.nome_cliente  }}</h6>
+                        <p class="text-xs text-secondary mb-0">{{ reserva.cliente.pessoa_contato }}</p>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <p class="text-xs font-weight-bold mb-0">{{ reserva.Apartamento.numero_apto }}</p>
+                    <p class="text-xs text-secondary mb-0">{{ reserva.Apartamento.get_tipo_display }}</p>
+                  </td>
+                  <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-normal">{{ reserva.periodo_inicio }}</span>
+                  </td>
+                    <td class="align-middle text-center">
+                    <span class="text-secondary text-xs font-weight-normal">{{ reserva.periodo_fim }}</span>
+                  </td>
+                  <td>
+                      <p class="text-xs font-weight-bold mb-0">{{ reserva.valor_total }}</p>
+                  </td>
+                  <td class="align-middle">
+                    <a href="javascript:;" class="text-secondary font-weight-normal text-xs" data-toggle="tooltip" data-original-title="Edit user" data-bs-toggle="modal" data-bs-target="#modal{{ reserva.cliente.id }}">
+                        Edit
+                    </a>
+                  </td>
+                </tr>
+
+                <!-- Modal -->
+                <div class="modal fade" id="modal{{ reserva.cliente.id }}" tabindex="-1" role="dialog" aria-labelledby="modal{{ reserva.cliente.id }}" aria-hidden="true" z-index-1050>
+                  <div class="modal-dialog modal-dialog-scrollable" role="document">
+                      <div class="modal-content">
+                          <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Resumo da Conta - {{ reserva.cliente.nome_cliente }}</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                              </button>
+                          </div>
+                          <div class="modal-body">
+
+                            <h5 class="display">Valor Estadia</h5>
+                            <div class="container">
+                              <div class="row">
+                                <div class="col">
+                                  <span class="text-secondary text-xs font-weight-normal"><b>Quarto</b></span>
+                                  <p class="text-secondary text-xs font-weight-normal">{{ reserva.Apartamento.numero_apto }} - {{ reserva.Apartamento.tipo }}</p>
+                                </div>
+                                <div class="col">
+                                  <span class="text-secondary text-xs font-weight-normal"><b>Data Saída</b></span>
+                                  <p class="text-secondary text-xs font-weight-normal">{{ reserva.periodo_fim }}</p>
+                                </div>
+                                <div class="col">
+                                  <span class="text-secondary text-xs font-weight-normal"><b>Qtde Dias</b></span>
+                                  <p class="text-secondary text-xs font-weight-normal">{{ reserva.get_time_diff }}</p>
+                                </div>
+                                <div class="col">
+                                  <span class="text-secondary text-xs font-weight-normal"><b>Valor Total</b></span>
+                                  <p class="text-secondary text-xs font-weight-normal">{{ reserva.valor_total }}</p>
+                                </div>
+                              </div>
+                            </div>
+                            <hr>
+
+                            <h5 class="display">Produtos Consumidos</h5>
+                            <div class="container">
+                              <div class="row">
+                                <div class="col-4">
+                                  <span class="text-secondary text-xs font-weight-normal"><b>Produto</b></span>
+                                </div>
+                                <div class="col-2">
+                                  <span class="text-secondary text-xs font-weight-normal"><b>Qtde</b></span>
+                                </div>
+                                <div class="col-3">
+                                  <span class="text-secondary text-xs font-weight-normal"><b>Preço Unitário</b></span>
+                                </div>
+                                <div class="col-3">
+                                  <span class="text-secondary text-xs font-weight-normal"><b>Valor Total</b></span>
+                                </div>
+                              </div>
+                            </div>
+                            <hr>
+                          
+                            {% for produto in cliente_produtos %}
+                              {% if produto.id_cliente.id == reserva.cliente.id %}
+                                <div class="container">
+                                  <div class="row">
+                                    <div class="col-4">
+                                      <span class="text-secondary text-xs font-weight-normal">{{ produto.id_produto.nome }}</span>
+                                    </div>
+                                    <div class="col-2">
+                                      <span class="text-secondary text-xs font-weight-normal">{{ produto.quantidade }}</span>
+                                    </div>
+                                    <div class="col-3">
+                                      <span class="text-secondary text-xs font-weight-normal">R$ {{ produto.id_produto.preco|floatformat:2 }}</span>
+                                    </div>
+                                    <div class="col-3">
+                                      <span class="text-secondary text-xs font-weight-normal">R$ {{ produto.get_total_value }}</span>
+                                    </div>
+                                  </div>
+                                </div>                                
+                                <hr>
+                              {% endif %}
+                              {% endfor %}
+                              <div class="row justify-content-between">
+                                <div class="col-4">
+                                  <p class="text-xs font-weight-bold mb-0">VALOR TOTAL DE ALIMENTAÇÃO:</p>
+                                </div>
+                                <div class="col-4">
+                                  <p><b>R$ {{ reserva.valor_total_produtos }}</b></p>
+                                </div>
+                              </div>
+                              <div class="row justify-content-between">
+                                <div class="col-4">
+                                  <p class="text-xs font-weight-bold mb-0">VALOR TOTAL:</p>
+                                </div>
+                                <div class="col-4">
+                                  <p><b>R$ {{ reserva.get_total }}</b></p>
+                                </div>
+                              </div>
+                             
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn bg-gradient-secondary" data-bs-dismiss="modal">Voltar</button>
+                            <form method="post" type="hidden">
+                              {% csrf_token %}
+                              <input type="hidden" name="cliente_id" value="{{ reserva.cliente.id }}"/>
+                              <button class="btn bg-gradient-primary" type="submit">Fechar Conta</button>
+                            </form>
+                          </div>
+                      </div>
+                  </div>
+                </div>
+            {% endif %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+</div>
+
